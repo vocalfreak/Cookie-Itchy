@@ -7,6 +7,16 @@ function extractSesskey() {
     if (typeof M !== "undefined" && M.cfg && M.cfg.sesskey) {
       return M.cfg.sesskey;
     }
+
+    const scripts = document.getElementsByTagName('script');
+    for (let script of scripts) {
+      if (script.textContent.includes('sesskey')) {
+        const match = script.textContent.match(/["']sesskey["']\s*:\s*["']([^"']+)["']/);
+        if (match && match[1]) {
+          return match[1];
+        }
+      }
+    }
       
     return null;
   } catch (error) {
@@ -64,3 +74,16 @@ async function fetchCalendarEvents() {
   throw new Error(data[0]?.exception?.message || 'Unknown error');
 }
 
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'fetchEvents') {
+    fetchCalendarEvents()
+      .then(result => {
+        chrome.runtime.sendMessage({ action: 'eventsScraped', events: result.events });
+        sendResponse(result);
+      })
+      .catch(error => {
+        sendResponse({ success: false, error: error.message });
+      });
+    return true;
+  }
+});

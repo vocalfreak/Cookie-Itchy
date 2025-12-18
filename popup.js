@@ -13,7 +13,6 @@ document.getElementById('scrapeBtn').addEventListener('click', async () => {
       return;
     }
     
-    // Send message to BACKGROUND script
     chrome.runtime.sendMessage({ action: 'scrapeEvents', tabId: tab.id }, (response) => {
       if (response && response.success) {
         statusDiv.textContent = `Success! Found ${response.events.length} events`;
