@@ -1,0 +1,22 @@
+{
+  "name": "Cookie Itchy",
+  "description": "Extract assignments from Ebwise and sync to google calendar",
+  "version": "1.0",
+  "manifest_version": 3,
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "cookie_logo.png"
+  },
+  "host_permissions": [
+    "https://ebwise.mmu.edu.my/*",
+    "http://localhost:3000/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
+}
