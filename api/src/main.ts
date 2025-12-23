@@ -7,7 +7,7 @@ async function bootstrap() {
   app.enableCors({
     origin: ['https://ebwise.mmu.edu.my', 
              'http://localhost:3000', 
-             'cookie-itchy-production.up.railway.app'],
+             'https://cookie-itchy-production.up.railway.app'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   });
