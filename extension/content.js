@@ -79,7 +79,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       .then(result => {
         chrome.runtime.sendMessage({ action: 'eventsScraped', events: result.events });
         
-        fetch('http://localhost:3000/events/scrape', {
+        fetch('https://cookie-itchy-production.up.railway.app/events/scrape', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ events: result.events })
