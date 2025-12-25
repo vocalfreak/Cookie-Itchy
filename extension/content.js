@@ -77,17 +77,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'fetchEvents') {
     fetchCalendarEvents()
       .then(result => {
-        chrome.runtime.sendMessage({ action: 'eventsScraped', events: result.events });
-        
-        fetch('https://cookie-itchy-production.up.railway.app/events/scrape', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ events: result.events })
-        })
-        .then(res => res.json())
-        .then(data => console.log(' Saved to API:', data))
-        .catch(err => console.error(' API Error:', err));
-        
+        chrome.runtime.sendMessage({ 
+          action: 'saveToBackend', 
+          events: result.events 
+        });
         sendResponse(result);
       })
       .catch(error => {
