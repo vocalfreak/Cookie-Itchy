@@ -8,9 +8,11 @@ import { EventsModule } from './events/events.module';
       type: 'postgres',
       url: process.env.DATABASE_URL,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: process.env.NODE_ENV !== 'production', 
-      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-      logging: true, 
+      synchronize: false, 
+      ssl: {
+        rejectUnauthorized: false
+      },
+      logging: ['error', 'warn'], 
       autoLoadEntities: true,
     }),
     EventsModule,
