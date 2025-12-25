@@ -5,9 +5,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: ['https://ebwise.mmu.edu.my', 
-             'http://localhost:3000', 
-             'https://cookie-itchy-production.up.railway.app'],
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   });
