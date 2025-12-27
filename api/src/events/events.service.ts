@@ -10,7 +10,7 @@ export class EventsService {
     private readonly eventsRepository: Repository<Event>,
   ) {}
 
-  async saveEvents(eventsData: any[]): Promise<void> {
+  async saveEventsBulk(eventsData: any[]): Promise<void> {
     const events = eventsData.map(eventData => {
       return this.eventsRepository.create({
         ebwise_id: eventData.id,
