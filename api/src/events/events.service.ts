@@ -10,7 +10,7 @@ export class EventsService {
     private readonly eventsRepository: Repository<Event>,
   ) {}
 
-  async saveEventsBulk(eventsData: any[]): Promise<void> {
+  async saveEvents(eventsData: any[]): Promise<Event[]> {
     const events = eventsData.map(eventData => {
       return this.eventsRepository.create({
         ebwise_id: eventData.id,
@@ -27,10 +27,8 @@ export class EventsService {
       });
     });
 
-    await this.eventsRepository.upsert(events, {
-      conflictPaths: ['ebwise_id'],
-      skipUpdateIfNoValuesChanged: true,
-    });
+    await this.eventsRepository.upsert(events, ['ebwise_id']);
+    return this.getAllEvents();
   }
 
   async getAllEvents(): Promise<Event[]> {
