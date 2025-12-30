@@ -27,7 +27,8 @@ export class EventsService {
       });
     });
 
-    return this.eventsRepository.save(events);
+    await this.eventsRepository.upsert(events, ['ebwise_id']);
+    return this.getAllEvents();
   }
 
   async getAllEvents(): Promise<Event[]> {
