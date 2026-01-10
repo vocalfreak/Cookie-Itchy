@@ -1,8 +1,2 @@
-# Google credentials
-client_secret*.json
-credentials.json
-*.json
+/.env
 
-# Environment variables
-.env
-.env.local

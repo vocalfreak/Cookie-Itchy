@@ -1,3 +1,5 @@
+const PROD_URL = 'https://cookie-itchy-production.up.railway.app/events/scrape';
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'scrapeEvents') {
     chrome.scripting.executeScript({
@@ -37,5 +39,48 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       sendResponse({ success: false, error: err.message });
     });
     return true; 
+  }
+
+  if (request.action === 'startGoogleAuth') {
+    fetch('https://cookie-itchy-production.up.railway.app/calendar/auth-url')
+      .then(res => res.json())
+      .then(data => {
+        chrome.windows.create({
+          url: data.authUrl,
+          type: 'popup',
+          width: 500,
+          height: 600
+        });
+      })
+      .catch(err => console.error('Auth URL error:', err));
+    return true;
+  }
+  
+  if (request.action === 'syncToCalendar') {
+    fetch('https://cookie-itchy-production.up.railway.app/calendar/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ accessToken: request.accessToken })
+    })
+    .then(res => res.json())
+    .then(data => {
+      sendResponse({ success: true, data });
+    })
+    .catch(err => {
+      sendResponse({ success: false, error: err.message });
+    });
+    return true;
+  }
+});
+
+chrome.runtime.onMessageExternal.addListener((request, sender, sendResponse) => {
+  if (request.type === 'GOOGLE_AUTH_SUCCESS') {
+    chrome.storage.local.set({
+      googleAccessToken: request.accessToken,
+      googleRefreshToken: request.refreshToken
+    });
+    
+    console.log(' Google auth successful, tokens stored');
+    sendResponse({ success: true });
   }
 });

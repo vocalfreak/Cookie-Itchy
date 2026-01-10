@@ -1,0 +1,30 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { CalendarController } from './calendar.controller';
+import { CalendarService } from './calendar.service';
+
+describe('CalendarController', () => {
+  let controller: CalendarController;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [CalendarController],
+      providers: [
+        {
+          provide: CalendarService,
+          useValue: {
+            getAuthUrl: jest.fn(),
+            getTokens: jest.fn(),
+            syncEvents: jest.fn(),
+            syncSingleEvent: jest.fn(),
+          },
+        },
+      ],
+    }).compile();
+
+    controller = module.get<CalendarController>(CalendarController);
+  });
+
+  it('should be defined', () => {
+    expect(controller).toBeDefined();
+  });
+});

@@ -1,18 +1,16 @@
-# docker-compose.yml
-version: "3.9"
+version: '3.8'
 services:
-  db:
+  postgres:
     image: postgres:15
-    container_name: cookie_itchy_postgres
-    restart: always
+    container_name: ebwise_db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: cookie_itchy
+      POSTGRES_DB: ebwise_dev
     ports:
       - "5432:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  db_data:
+  postgres_data:
