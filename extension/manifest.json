@@ -20,6 +20,8 @@
     "service_worker": "background.js"
   },
   "externally_connectable": {
-    "matches": ["https://cookie-itchy-production.up.railway.app/*"]
+    "matches": 
+    ["http://localhost:3000/*",
+     "https://cookie-itchy-production.up.railway.app/*"]
   }
 }

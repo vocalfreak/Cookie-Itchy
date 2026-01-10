@@ -12,6 +12,7 @@ export class CalendarService {
     @InjectRepository(Event)
     private readonly eventsRepository: Repository<Event>,
   ) {
+
     this.oauth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
@@ -22,7 +23,7 @@ export class CalendarService {
   getAuthUrl(): string {
     return this.oauth2Client.generateAuthUrl({
       access_type: 'offline',
-      scope: ['https://www.googleapis.com/auth/calendar.events'],
+      scope: ['https://www.googleapis.com/auth/tasks'],
       prompt: 'consent',
     });
   }
@@ -32,9 +33,9 @@ export class CalendarService {
     return tokens;
   }
 
-  async syncEvents(accessToken: string) {
+  async syncTasks(accessToken: string) {
     this.oauth2Client.setCredentials({ access_token: accessToken });
-    const calendar = google.calendar({ version: 'v3', auth: this.oauth2Client });
+    const tasks = google.tasks({ version: 'v1', auth: this.oauth2Client });
 
     const events = await this.eventsRepository.find({
       where: { synced_to_calendar: false, overdue: false },
@@ -44,33 +45,21 @@ export class CalendarService {
     const results = {
       synced: 0,
       failed: 0,
-      total: events.length,
+      total: events.length,   
       details: [] as any[],
     };
 
     for (const event of events) {
       try {
-        const calendarEvent = {
-          summary: `[${event.course_name}] ${event.title}`,
-          description: event.description,
-          start: {
-            dateTime: event.due_date.toISOString(),
-            timeZone: 'Asia/Kuala_Lumpur',
-          },
-          end: {
-            dateTime: new Date(event.due_date.getTime() + 60 * 60 * 1000).toISOString(),
-            timeZone: 'Asia/Kuala_Lumpur',
-          },
-          source: {
-            title: 'Ebwise',
-            url: event.url,
-          },
-          colorId: this.getEventColor(event.module_type),
+        const task = {
+          title: `${event.title}`,
+          notes: `[${event.course_name}]\n\n ${event.description}\n\n ${event.url}`,
+          due: event.due_date.toISOString(),
         };
 
-        const response = await calendar.events.insert({
-          calendarId: 'primary',
-          requestBody: calendarEvent,
+        const response = await tasks.tasks.insert({
+          tasklist: '@default',
+          requestBody: task,
         });
 
         await this.eventsRepository.update(event.id, {
@@ -88,75 +77,10 @@ export class CalendarService {
       } catch (error) {
         console.error(`Failed to sync event ${event.id}:`, error.message);
         results.failed++;
-        results.details.push({
-          eventId: event.id,
-          title: event.title,
-          status: 'failed',
-          error: error.message,
-        });
       }
     }
 
     return results;
   }
 
-  async syncSingleEvent(eventId: number, accessToken: string) {
-    this.oauth2Client.setCredentials({ access_token: accessToken });
-    const calendar = google.calendar({ version: 'v3', auth: this.oauth2Client });
-
-    const event = await this.eventsRepository.findOne({ where: { id: eventId } });
-    
-    if (!event) {
-      throw new Error('Event not found');
-    }
-
-    if (event.synced_to_calendar) {
-      return {
-        success: false,
-        message: 'Event already synced',
-        googleEventId: event.google_calendar_id,
-      };
-    }
-
-    const calendarEvent = {
-      summary: `[${event.course_name}] ${event.title}`,
-      description: event.description,
-      start: {
-        dateTime: event.due_date.toISOString(),
-        timeZone: 'Asia/Kuala_Lumpur',
-      },
-      end: {
-        dateTime: new Date(event.due_date.getTime() + 60 * 60 * 1000).toISOString(),
-        timeZone: 'Asia/Kuala_Lumpur',
-      },
-      colorId: this.getEventColor(event.module_type),
-    };
-
-    const response = await calendar.events.insert({
-      calendarId: 'primary',
-      requestBody: calendarEvent,
-    });
-
-    await this.eventsRepository.update(event.id, {
-      synced_to_calendar: true,
-      google_calendar_id: response.data.id!,
-    });
-
-    return {
-      success: true,
-      googleEventId: response.data.id,
-      event: response.data,
-    };
-  }
-
-  private getEventColor(moduleType: string): string {
-    const colorMap: Record<string, string> = {
-      'assign': '11',    // Red
-      'quiz': '5',       // Yellow
-      'forum': '2',      // Green
-      'resource': '9',   // Blue
-      'feedback': '6',   // Orange
-    };
-    return colorMap[moduleType] || '1'; // Default lavender
-  }
 }

@@ -24,7 +24,7 @@ export class CalendarController {
         <body>
           <h2> Success!</h2>
           <script>
-            chrome.runtime.sendMessage('YOUR_EXTENSION_ID_HERE', {
+            chrome.runtime.sendMessage('cnmlclbpooopobaddgjefbkagmfojfha', {
               type: 'GOOGLE_AUTH_SUCCESS',
               accessToken: '${tokens.access_token}',
               refreshToken: '${tokens.refresh_token}'
@@ -37,11 +37,11 @@ export class CalendarController {
   }
 
   @Post('sync')
-  async syncAllEvents(@Body('accessToken') accessToken: string) {
-    const result = await this.calendarService.syncEvents(accessToken);
+  async syncAllTasks(@Body('accessToken') accessToken: string) {
+    const result = await this.calendarService.syncTasks(accessToken);
     return {
       success: true,
-      message: `Synced ${result.synced} events`,
+      message: `Synced ${result.synced} tasks`,
       ...result,
     };
   }

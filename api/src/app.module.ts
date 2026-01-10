@@ -7,7 +7,7 @@ import { CalendarModule } from './calendar/calendar.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ['.env.local', '.env'],
+      envFilePath: ['.env'],
       isGlobal: true,
     }),
     TypeOrmModule.forRoot({

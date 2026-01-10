@@ -1,3 +1,5 @@
+const PROD_URL = 'https://cookie-itchy-production.up.railway.app/events/scrape';
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'scrapeEvents') {
     chrome.scripting.executeScript({
